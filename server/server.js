@@ -40,6 +40,14 @@ io.on("connection", (socket) => {
     socket.on("disconnect", () => console.log("User disconnected:", socket.id));
 });
 
+// Serve `public` folder and fallback to `index.html` **for deployment** so Angular routing works.
+const path = require('path');
+app.use(express.static(path.join(__dirname, 'public')));
+app.get(/.*/, (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+
 // Start server
 const PORT = process.env.PORT || 5000;
 httpServer.listen(PORT, () => console.log(`Server running on port ${PORT}`));

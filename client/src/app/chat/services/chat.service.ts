@@ -13,8 +13,10 @@ export class ChatService {
   private socketId$ = new BehaviorSubject<string | null>(null);
 
   constructor() {
-    this.socket = io(environment.apiUrl);
 
+    this.socket = io(environment.apiUrl, {
+      transports: ['websocket', 'polling']
+    });
 
     this.socket.on('connect', () => {
       this.socketId$.next(this.socket.id!);

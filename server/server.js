@@ -40,22 +40,6 @@ io.on("connection", (socket) => {
     socket.on("disconnect", () => console.log("User disconnected:", socket.id));
 });
 
-const fs = require("fs");
-const path = require("path");
-const clientDistPath = path.join(__dirname, "dist/client/browser");
-
-if (fs.existsSync(clientDistPath)) {
-  // Serve Angular static files
-  app.use(express.static(clientDistPath));
-
-  // Catch all other routes and return index.html
-  app.get("*", (req, res) => {
-    res.sendFile(path.join(clientDistPath, "index.html"));
-  });
-} else {
-  console.log("Warning: Angular dist folder not found. Only API is available.");
-}
-
 // Start server
 const PORT = process.env.PORT || 5000;
 httpServer.listen(PORT, () => console.log(`Server running on port ${PORT}`));

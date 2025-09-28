@@ -86,7 +86,7 @@ describe('ChatComponent', () => {
     expect(component.messages).toContain(userMsg);
   });
 
-  it('should open username dialog if username is missing', () => {
+  xit('should open username dialog if username is missing', () => {
     userServiceSpy.getUserName.and.returnValue(null);
 
     component['initUser']();

@@ -40,6 +40,13 @@ io.on("connection", (socket) => {
     socket.on("disconnect", () => console.log("User disconnected:", socket.id));
 });
 
+const path = require('path');
+app.use(express.static(path.join(__dirname, 'public/browser')));
+
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public/browser', 'index.html'));
+});
+
 // Start server
 const PORT = process.env.PORT || 5000;
 httpServer.listen(PORT, '0.0.0.0', () => console.log(`Server running on port ${PORT}`));

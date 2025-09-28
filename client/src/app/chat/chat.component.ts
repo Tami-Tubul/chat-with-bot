@@ -29,16 +29,17 @@ export class ChatComponent {
       console.log('Loaded currentUserId from localStorage:', this.currentUserId);
     }
 
+    // Load existing username; ask for one if not set
     const storedName = this.userService.getUserName();
     if (!storedName) {
-      this.askForUsername();
+      this.askForUsername(); // Open dialog to request username
     }
 
     // Subscribe to socket ID and save if needed
     this.chatService.getSocketId().subscribe(id => {
       if (id && !this.currentUserId) {
         this.currentUserId = id;
-        this.userService.setUserId(id);
+        this.userService.setUserId(id); // Save to localStorage
         console.log('Saved new currentUserId to localStorage:', this.currentUserId);
       }
     });
@@ -51,7 +52,7 @@ export class ChatComponent {
 
     // Listen for new messages
     this.chatService.onNewMessage().subscribe(msg => {
-      if (msg.type === 'bot') {
+      if (msg.type === 'bot') { // If message is from bot
         this.botTyping = true;
         this.scrollToBottom();
 
@@ -61,29 +62,31 @@ export class ChatComponent {
           this.scrollToBottom();
         }, 3000)
       }
-      else {
+      else {  // If message is from a user
         this.messages.push(msg);
         this.scrollToBottom();
       }
     });
   }
 
+  // Opens a dialog for the user to enter their username
   askForUsername() {
     const dialogRef = this.dialog.open(UsernameDialogComponent, {
-      disableClose: true,
+      disableClose: true, // Prevent closing dialog without entering a name
     });
 
     dialogRef.afterClosed().subscribe(username => {
       if (username) {
         this.currentUserName = username;
-        this.userService.setUserName(username);
+        this.userService.setUserName(username); // Save username in localStorage
         console.log('Username saved:', username);
       }
     });
   }
 
+  // Sends a new chat message
   onSend(text: string) {
-    if (!text.trim()) return;
+    if (!text.trim()) return; // Do nothing if text is empty
 
     this.chatService.sendMessage({
       text,
@@ -93,10 +96,12 @@ export class ChatComponent {
     this.scrollToBottom();
   }
 
+  // Checks if a message was sent by the current user
   isMyMessage(msg: Message) {
     return msg.userId === this.currentUserId;
   }
 
+  // Scrolls the chat container to the bottom
   scrollToBottom() {
     setTimeout(() => {
       const container = document.querySelector('.messages');

@@ -6,6 +6,8 @@ import { ChatMessageComponent } from './components/chat-message/chat-message.com
 import { ChatInputComponent } from './components/chat-input/chat-input.component';
 import { UsernameDialogComponent } from '../shared/components/username-dialog/username-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
+import { Subject, Subscription, takeUntil, timer } from 'rxjs';
+import { scrollToBottom } from '../shared/utils/auto-scroll';
 
 @Component({
   selector: 'app-chat',
@@ -20,93 +22,113 @@ export class ChatComponent {
   currentUserId: string = "";
   currentUserName: string = "";
 
-  constructor(public chatService: ChatService, private userService: UserService, private dialog: MatDialog) {
+  private destroy$ = new Subject<void>();
 
-    // Load existing ID from storage
+  constructor(public chatService: ChatService,
+    private userService: UserService,
+    private dialog: MatDialog) { }
+
+  ngOnInit(): void {
+    this.initUser();
+    this.initSocketId();
+    this.initChatHistory();
+    this.initNewMessages();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  /** --- Initialization --- */
+  private initUser(): void {
     const storedId = this.userService.getUserId();
     if (storedId) {
       this.currentUserId = storedId;
-      console.log('Loaded currentUserId from localStorage:', this.currentUserId);
     }
 
-    // Load existing username; ask for one if not set
     const storedName = this.userService.getUserName();
     if (!storedName) {
-      this.askForUsername(); // Open dialog to request username
+      this.askForUsername();
+    } else {
+      this.currentUserName = storedName;
     }
+  }
 
-    // Subscribe to socket ID and save if needed
-    this.chatService.getSocketId().subscribe(id => {
-      if (id && !this.currentUserId) {
-        this.currentUserId = id;
-        this.userService.setUserId(id); // Save to localStorage
-        console.log('Saved new currentUserId to localStorage:', this.currentUserId);
-      }
-    });
+  private initSocketId(): void {
+    this.chatService.getSocketId()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(id => {
+        if (id && !this.currentUserId) {
+          this.currentUserId = id;
+          this.userService.setUserId(id);
+        }
+      });
+  }
 
-    // Load history
-    this.chatService.getChatHistory().subscribe(history => {
-      this.messages = history;
-      this.scrollToBottom();
-    });
+  private initChatHistory(): void {
+    this.chatService.getChatHistory()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(history => {
+        this.messages = history;
+        scrollToBottom('.messages');
+      });
+  }
 
-    // Listen for new messages
-    this.chatService.onNewMessage().subscribe(msg => {
-      if (msg.type === 'bot') { // If message is from bot
-        this.botTyping = true;
-        this.scrollToBottom();
+  private initNewMessages(): void {
+    this.chatService.onNewMessage()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(msg => this.handleNewMessage(msg));
+  }
 
-        setTimeout(() => {
+  /** --- Handle new messages --- */
+  private handleNewMessage(msg: Message): void {
+    if (msg.type === 'bot') {
+      this.botTyping = true;
+      scrollToBottom('.messages');
+      timer(3000)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe(() => {
           this.botTyping = false;
           this.messages.push(msg);
-          this.scrollToBottom();
-        }, 3000)
-      }
-      else {  // If message is from a user
-        this.messages.push(msg);
-        this.scrollToBottom();
-      }
-    });
+          scrollToBottom('.messages');
+        });
+
+
+    } else {
+      this.messages.push(msg);
+      scrollToBottom('.messages');
+    }
   }
 
-  // Opens a dialog for the user to enter their username
-  askForUsername() {
-    const dialogRef = this.dialog.open(UsernameDialogComponent, {
-      disableClose: true, // Prevent closing dialog without entering a name
-    });
-
-    dialogRef.afterClosed().subscribe(username => {
-      if (username) {
-        this.currentUserName = username;
-        this.userService.setUserName(username); // Save username in localStorage
-        console.log('Username saved:', username);
-      }
-    });
+  /** --- User interactions --- */
+  askForUsername(): void {
+    const dialogRef = this.dialog.open(UsernameDialogComponent, { disableClose: true });
+    dialogRef.afterClosed()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(username => {
+        if (username) {
+          this.currentUserName = username;
+          this.userService.setUserName(username);
+        }
+      });
   }
 
-  // Sends a new chat message
-  onSend(text: string) {
-    if (!text.trim()) return; // Do nothing if text is empty
+  onSend(text: string): void {
+    const trimmed = text.trim();
+    if (!trimmed) return;
 
     this.chatService.sendMessage({
-      text,
+      text: trimmed,
       userId: this.currentUserId,
       userName: this.currentUserName
     });
-    this.scrollToBottom();
+    scrollToBottom('.messages');
   }
 
-  // Checks if a message was sent by the current user
-  isMyMessage(msg: Message) {
+  /** --- Helpers --- */
+  isMyMessage(msg: Message): boolean {
     return msg.userId === this.currentUserId;
-  }
-
-  // Scrolls the chat container to the bottom
-  scrollToBottom() {
-    setTimeout(() => {
-      const container = document.querySelector('.messages');
-      if (container) container.scrollTop = container.scrollHeight;
-    }, 100);
   }
 
 }

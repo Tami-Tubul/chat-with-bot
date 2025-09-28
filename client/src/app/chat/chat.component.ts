@@ -14,12 +14,11 @@ import { MatDialog } from '@angular/material/dialog';
   styleUrl: './chat.component.scss',
 })
 export class ChatComponent {
-  messages: Message[] = [];
-  botTyping: boolean = false;
+  messages: Message[] = []; // List of chat messages
+  botTyping: boolean = false; // Flag for showing "Angularbot is typing"
 
   currentUserId: string = "";
   currentUserName: string = "";
-  userColors = new Map<string, string>();
 
   constructor(public chatService: ChatService, private userService: UserService, private dialog: MatDialog) {
 

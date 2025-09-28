@@ -22,8 +22,4 @@ export class UsernameDialogComponent {
       this.dialogRef.close(this.username.value?.trim());
     }
   }
-
-  onCancel() {
-    this.dialogRef.close(null);
-  }
 }

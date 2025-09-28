@@ -1,1 +1,31 @@
 /* You can add global styles to this file, and also import other style files */
+
+:root {
+  /* Colors */
+  --color-primary: #00bcd4;
+  --color-accent: #ff9800;
+  --color-bg-main: #121212;
+  --color-bg-container: #1e1e1e;
+  --color-text-light: #ffffff;
+  --color-text-dark: #000000;
+  --color-border: #333333;
+  --color-input-bg: #1f1f1f;
+  --color-current-user: #4caf50;
+  --color-other-user: #2196f3;
+}
+
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  direction: rtl;
+  background-color: var(--color-bg-main);
+  color: var(--color-text-light);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}

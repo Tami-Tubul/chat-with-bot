@@ -1,0 +1,12 @@
+<div
+  class="message-container"
+  [ngClass]="{
+    'my-message': isMyMessage(),
+    'other-message': !isMyMessage()
+  }"
+>
+  <div class="message-user">
+    {{ message.userId === "bot" ? "🤖 AngularBot" : getUserName() }}
+  </div>
+  <div class="message-text">{{ message.text }}</div>
+</div>

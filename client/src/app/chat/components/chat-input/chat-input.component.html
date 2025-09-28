@@ -1,0 +1,19 @@
+<form class="chat-input-form" (ngSubmit)="sendMessage()">
+  <mat-form-field class="chat-input-field" appearance="fill">
+    <mat-label>הקלד את ההודעה שלך...</mat-label>
+    <input
+      matInput
+      [formControl]="messageControl"
+      (keydown.enter)="sendMessage()"
+    />
+  </mat-form-field>
+
+  <button
+    mat-raised-button
+    color="accent"
+    type="submit"
+    [disabled]="messageControl.invalid"
+  >
+    שלח
+  </button>
+</form>

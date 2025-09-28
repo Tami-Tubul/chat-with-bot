@@ -1,0 +1,17 @@
+<div class="chat-container">
+  <div class="chat-welcome">
+    <span>ברוכים הבאים לצ'אט המדהים שלנו 👋</span>
+    <span>הבוט שלנו מחכה לתת תשובות עם טוויסט ייחודי 🤖</span>
+    <span>תהנו מהחוויה, ותתחילו בשאלה הראשונה שלכם 🚀</span>
+  </div>
+  <div class="messages">
+    @for(msg of messages; track $index){
+    <app-message [message]="msg" [currentUserId]="currentUserId"></app-message>
+    } @if(botTyping) {
+    <div class="typing-indicator">
+      🤖 AngularBot is typing <span></span><span></span><span></span>
+    </div>
+    }
+  </div>
+  <app-chat-input (send)="onSend($event)"></app-chat-input>
+</div>

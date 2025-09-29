@@ -1,5 +1,5 @@
 import { Component, ElementRef, EventEmitter, HostListener, Input, Output, ViewChild } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AppMaterialModule } from '../../../app.material.module';
 import { PickerComponent } from '@ctrl/ngx-emoji-mart';
 import { debounceTime } from 'rxjs';
@@ -12,8 +12,6 @@ import { ChatService } from './../../services/chat.service';
   styleUrl: './chat-input.component.scss',
 })
 export class ChatInputComponent {
-  chatForm!: FormGroup;
-
   @Input() currentUserName!: string;
   @Output() send = new EventEmitter<string>();
   @ViewChild('emojiPickerWrapper') emojiPickerWrapper!: ElementRef;

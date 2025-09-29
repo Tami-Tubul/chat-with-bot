@@ -6,7 +6,7 @@ import { ChatMessageComponent } from './components/chat-message/chat-message.com
 import { ChatInputComponent } from './components/chat-input/chat-input.component';
 import { UsernameDialogComponent } from '../shared/components/username-dialog/username-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
-import { Subject, Subscription, takeUntil, timer } from 'rxjs';
+import { Subject, takeUntil } from 'rxjs';
 import { scrollToBottom } from '../shared/utils/auto-scroll';
 
 @Component({

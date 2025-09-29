@@ -41,7 +41,7 @@ describe('ChatMessageComponent', () => {
       id: '1',
       timestamp: new Date()
     } as Message;
-    expect(component.isMyMessage()).toBeTrue();
+    expect(component.isMyMessage).toBeTrue();
   });
 
   it('should return false if message is from another user', () => {
@@ -53,7 +53,7 @@ describe('ChatMessageComponent', () => {
       id: '2',
       timestamp: new Date()
     } as Message;
-    expect(component.isMyMessage()).toBeFalse();
+    expect(component.isMyMessage).toBeFalse();
   });
 
   it('should return the message userName', () => {
@@ -63,7 +63,7 @@ describe('ChatMessageComponent', () => {
       text: 'Hello',
       id: '1', timestamp: new Date()
     } as Message;
-    expect(component.getUserName()).toBe('Tami');
+    expect(component.getUserName).toBe('Tami');
   });
 
 });

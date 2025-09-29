@@ -1,19 +1,28 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 
 import { ChatInputComponent } from './chat-input.component';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { AppMaterialModule } from '../../../app.material.module';
+import { ChatService } from '../../services/chat.service';
 
 describe('ChatInputComponent', () => {
   let component: ChatInputComponent;
   let fixture: ComponentFixture<ChatInputComponent>;
+  let chatServiceSpy: any;
 
   beforeEach(async () => {
+    chatServiceSpy = jasmine.createSpyObj('ChatService', ['emitTyping', 'emitStopTyping']);
+
     await TestBed.configureTestingModule({
-      imports: [ChatInputComponent]
-    })
-      .compileComponents();
+      imports: [FormsModule, ReactiveFormsModule, AppMaterialModule, ChatInputComponent],
+      providers: [
+        { provide: ChatService, useValue: chatServiceSpy }
+      ]
+    }).compileComponents();
 
     fixture = TestBed.createComponent(ChatInputComponent);
     component = fixture.componentInstance;
+    component.currentUserName = 'Tami';
     fixture.detectChanges();
   });
 
@@ -39,4 +48,15 @@ describe('ChatInputComponent', () => {
 
     expect(component.send.emit).not.toHaveBeenCalled();
   });
+
+  it('should call emitTyping and emitStopTyping on typing', fakeAsync(() => {
+    component.messageControl.setValue('Hello');
+    tick(500); // debounce time
+    expect(chatServiceSpy.emitTyping).toHaveBeenCalledWith('Tami');
+
+    component.messageControl.setValue('');
+    tick(500);
+    expect(chatServiceSpy.emitStopTyping).toHaveBeenCalledWith('Tami');
+  }));
+
 });

@@ -8,6 +8,20 @@ describe('ChatService', () => {
 
     beforeEach(() => {
         socketSpy = jasmine.createSpyObj('Socket', ['on', 'emit']);
+
+        socketSpy.on.and.callFake((event: string, cb: Function) => {
+            if (event === 'newMessage') cb({
+                id: '1',
+                text: 'Hello',
+                userId: '456',
+                userName: 'Bot',
+                timestamp: new Date(),
+                type: 'user'
+            });
+            if (event === 'userTyping') cb({ userId: '456', userName: 'Alice' });
+            if (event === 'userStopTyping') cb({ userId: '456' });
+        });
+
         TestBed.configureTestingModule({
             providers: [
                 ChatService,
@@ -42,6 +56,20 @@ describe('ChatService', () => {
 
         service.onNewMessage().subscribe(msg => {
             expect(msg).toEqual(newMsg);
+            done();
+        });
+    });
+
+    it('should notify subscribers when a user starts typing', (done) => {
+        service.onUserTyping().subscribe(data => {
+            expect(data.userName).toBe('Alice');
+            done();
+        });
+    });
+
+    it('should notify subscribers when a user stops typing', (done) => {
+        service.onUserStopTyping().subscribe(data => {
+            expect(data.userId).toBe('456');
             done();
         });
     });

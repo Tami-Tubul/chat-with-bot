@@ -1,12 +1,31 @@
 <form class="chat-input-form" (ngSubmit)="sendMessage()">
   <mat-form-field class="chat-input-field" appearance="fill">
     <mat-label>הקלד את ההודעה שלך...</mat-label>
-    <input
+    <textarea
       matInput
       [formControl]="messageControl"
-      (keydown.enter)="sendMessage()"
-    />
+      (keydown)="onKeyDown($event)"
+      rows="1"
+      cdkTextareaAutosize
+      #autosize="cdkTextareaAutosize"
+    ></textarea>
   </mat-form-field>
+
+  <button
+    class="emoji-picker-btn"
+    type="button"
+    (click)="toggleEmojiPicker()"
+    mat-icon-button
+  >
+    😊
+  </button>
+
+  <!-- Emoji Picker -->
+  @if(showEmojiPicker){
+  <div #emojiPickerWrapper class="emoji-panel">
+    <emoji-mart (emojiSelect)="addEmoji($event)" [darkMode]="true"></emoji-mart>
+  </div>
+  }
 
   <button
     mat-raised-button

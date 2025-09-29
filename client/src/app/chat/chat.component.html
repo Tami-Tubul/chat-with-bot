@@ -1,8 +1,10 @@
 <div class="chat-container">
   <div class="chat-welcome" role="heading" aria-level="1">
-    <span>ברוכים הבאים לצ'אט המדהים שלנו 👋</span>
-    <span>הבוט שלנו מחכה לתת תשובות עם טוויסט ייחודי 🤖</span>
-    <span>תהנו מהחוויה, ותתחילו בשאלה הראשונה שלכם 🚀</span>
+    <span>ברוכים הבאים! 👋</span>
+    <span>כאן תוכלו לדבר עם החברים שלכם 🗨️</span>
+    <span
+      >ולקבל תשובות משעשעות מהבוט שלנו 🤖 מומחה באנגלר ופיתוח אתרים 💻✨</span
+    >
   </div>
   <ul class="messages" aria-live="polite">
     @for(msg of messages; track msg.id){
@@ -11,11 +13,18 @@
       [currentUserId]="currentUserId"
       role="listitem"
     ></app-message>
-    } @if(botTyping) {
-    <div class="typing-indicator" aria-live="polite">
-      🤖 AngularBot is typing <span></span><span></span><span></span>
-    </div>
     }
   </ul>
-  <app-chat-input (send)="onSend($event)"></app-chat-input>
+
+  @if(typingUsers.length > 0){
+  <div class="typing-indicator" aria-live="polite">
+    @for(user of typingUsers; track user.userId){
+    {{ user.userName }} מקליד/ה <span></span><span></span><span></span> }
+  </div>
+  }
+
+  <app-chat-input
+    (send)="onSend($event)"
+    [currentUserName]="currentUserName"
+  ></app-chat-input>
 </div>

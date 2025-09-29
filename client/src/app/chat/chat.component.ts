@@ -17,7 +17,8 @@ import { scrollToBottom } from '../shared/utils/auto-scroll';
 })
 export class ChatComponent {
   messages: Message[] = []; // List of chat messages
-  botTyping: boolean = false; // Flag for showing "Angularbot is typing"
+  typingUsers: { userId: string, userName: string }[] = [];
+
 
   currentUserId: string = "";
   currentUserName: string = "";
@@ -32,8 +33,10 @@ export class ChatComponent {
     this.initUser();
     this.initSocketId();
     this.initChatHistory();
+    this.initTypingEvents();
     this.initNewMessages();
   }
+
 
   ngOnDestroy(): void {
     this.destroy$.next();
@@ -41,6 +44,8 @@ export class ChatComponent {
   }
 
   /** --- Initialization --- */
+
+  /** Initializes the current user ID and username from UserService or asks for username. */
   private initUser(): void {
     const storedId = this.userService.getUserId();
     if (storedId) {
@@ -55,6 +60,7 @@ export class ChatComponent {
     }
   }
 
+  /** Subscribes to the socket ID from ChatService and stores it in UserService. */
   private initSocketId(): void {
     this.chatService.getSocketId()
       .pipe(takeUntil(this.destroy$))
@@ -66,6 +72,7 @@ export class ChatComponent {
       });
   }
 
+  /** Fetches the chat history from the server and scrolls to bottom. */
   private initChatHistory(): void {
     this.chatService.getChatHistory()
       .pipe(takeUntil(this.destroy$))
@@ -75,6 +82,24 @@ export class ChatComponent {
       });
   }
 
+  /** Listens for other users typing and stop-typing events and updates the typingUsers array accordingly. */
+  private initTypingEvents(): void {
+    this.chatService.onUserTyping()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(({ userId, userName }) => {
+        if (userId !== this.currentUserId && !this.typingUsers.find(u => u.userId === userId)) {
+          this.typingUsers.push({ userId, userName });
+        }
+      });
+
+    this.chatService.onUserStopTyping()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(({ userId }) => {
+        this.typingUsers = this.typingUsers.filter(u => u.userId !== userId);
+      });
+  }
+
+  /** Subscribes to new incoming messages from the server. */
   private initNewMessages(): void {
     this.chatService.onNewMessage()
       .pipe(takeUntil(this.destroy$))
@@ -83,27 +108,18 @@ export class ChatComponent {
 
   /** --- Handle new messages --- */
   private handleNewMessage(msg: Message): void {
-    if (msg.type === 'bot') {
-      this.botTyping = true;
-      scrollToBottom('.messages');
-      timer(3000)
-        .pipe(takeUntil(this.destroy$))
-        .subscribe(() => {
-          this.botTyping = false;
-          this.messages.push(msg);
-          scrollToBottom('.messages');
-        });
-
-
-    } else {
-      this.messages.push(msg);
-      scrollToBottom('.messages');
-    }
+    this.messages.push(msg);
+    scrollToBottom('.messages');
   }
 
-  /** --- User interactions --- */
+  /** Opens a dialog to prompt the user for a username if none exists. */
   askForUsername(): void {
-    const dialogRef = this.dialog.open(UsernameDialogComponent, { disableClose: true });
+    const dialogRef = this.dialog.open(UsernameDialogComponent,
+      {
+        disableClose: true,
+        autoFocus: true
+      });
+
     dialogRef.afterClosed()
       .pipe(takeUntil(this.destroy$))
       .subscribe(username => {
@@ -114,6 +130,7 @@ export class ChatComponent {
       });
   }
 
+  /** Sends a message to the server and scrolls the chat to the bottom. */
   onSend(text: string): void {
     const trimmed = text.trim();
     if (!trimmed) return;
@@ -126,7 +143,7 @@ export class ChatComponent {
     scrollToBottom('.messages');
   }
 
-  /** --- Helpers --- */
+  /** Returns true if the given message was sent by the current user. */
   isMyMessage(msg: Message): boolean {
     return msg.userId === this.currentUserId;
   }

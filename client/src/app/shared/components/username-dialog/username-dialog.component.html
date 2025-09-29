@@ -1,9 +1,10 @@
-<h2 mat-dialog-title>בחר שם משתמש</h2>
+<h2 mat-dialog-title>הקלד שם משתמש</h2>
 <form (ngSubmit)="onSave()">
   <div mat-dialog-content>
-    <mat-form-field appearance="outline" style="width: 100%">
+    <mat-form-field appearance="outline">
       <mat-label>שם משתמש</mat-label>
       <input matInput [formControl]="username" />
+      <mat-error>חובה להזין שם משתמש</mat-error>
     </mat-form-field>
   </div>
   <div mat-dialog-actions align="end">

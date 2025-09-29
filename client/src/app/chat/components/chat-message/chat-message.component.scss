@@ -10,20 +10,29 @@
   color: #fff;
 
   &.my-message {
+    float: left;
     background-color: var(--color-current-user);
   }
 
   &.other-message {
-    float: left;
     background-color: var(--color-other-user);
   }
 
   .message-user {
     font-weight: bold;
+    font-size: 14px;
     margin-bottom: 4px;
   }
 
   .message-text {
     white-space: pre-wrap;
+  }
+
+  .timestamp {
+    font-size: 12px;
+    padding-top: 5px;
+    text-align: left;
+    color: var(--color-text-light);
+    opacity: 0.5;
   }
 }

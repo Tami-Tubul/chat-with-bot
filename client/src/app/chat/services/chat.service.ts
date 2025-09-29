@@ -43,6 +43,30 @@ export class ChatService {
     });
   }
 
+  /** Observable that emits whenever a user starts typing. */
+  onUserTyping() {
+    return new Observable<{ userId: string, userName: string }>(observer => {
+      this.socket.on('userTyping', data => observer.next(data));
+    });
+  }
+
+  /** Observable that emits whenever a user stops typing. */
+  onUserStopTyping() {
+    return new Observable<{ userId: string }>(observer => {
+      this.socket.on('userStopTyping', data => observer.next(data));
+    });
+  }
+
+  /** Emits a typing event to notify the server that the current user is typing. */
+  emitTyping(userName: string) {
+    this.socket.emit('typing', userName);
+  }
+
+  /** Emits a stopTyping event to notify the server that the current user stopped typing. */
+  emitStopTyping(userName: string) {
+    this.socket.emit('stopTyping', userName);
+  }
+
   // Returns an observable of new incoming messages from the server
   onNewMessage(): Observable<Message> {
     return new Observable(observer => {
@@ -52,7 +76,7 @@ export class ChatService {
     });
   }
 
-  // Sends a message to the server via Socket.IO
+  /** Sends a chat message to the server via Socket.IO. */
   sendMessage(msg: { text: string, userId: string, userName: string }) {
     this.socket.emit('sendMessage', msg); // Emit sendMessage event with message payload
   }

@@ -1,8 +1,17 @@
 /* You can add global styles to this file, and also import other style files */
 
+// overide material font-family
+@import url("https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap");
+
+*,
+*::before,
+*::after {
+  font-family: "Rubik", sans-serif !important;
+}
+
 :root {
   /* Colors */
-  --color-primary: #00bcd4;
+  --color-primary: #19d4ec;
   --color-accent: #ff9800;
   --color-bg-main: #121212;
   --color-bg-container: #1e1e1e;
@@ -10,8 +19,8 @@
   --color-text-dark: #000000;
   --color-border: #333333;
   --color-input-bg: #1f1f1f;
-  --color-current-user: #4caf50;
-  --color-other-user: #2196f3;
+  --color-current-user: #04473f;
+  --color-other-user: #202d34;
 }
 
 html,
@@ -20,9 +29,10 @@ body {
 }
 body {
   margin: 0;
-  font-family: "Rubik", Roboto, "Helvetica Neue", sans-serif;
   direction: rtl;
   background-color: var(--color-bg-main);
+  background: linear-gradient(0deg, #0d4f5c, #1c6b73);
+
   color: var(--color-text-light);
   overflow: hidden;
   display: flex;

@@ -1,7 +1,7 @@
 const keywords = [
     // Angular & Frontend
     'angular', 'rxjs', 'ngrx', 'components', 'directives', 'services', 'pipes', 'modules',
-    'frontend', 'web', 'typescript', 'html', 'css', 'scss', 'sass', 'javascript', 'js',
+    'frontend', 'web', 'typescript', 'ts', 'html', 'css', 'scss', 'sass', 'javascript', 'js',
     'api', 'observables', 'routing', 'state', 'forms', 'lazy loading', 'dependency injection',
     'change detection', 'template', 'ng-content', 'ng-template', 'zone.js', 'webpack',
 

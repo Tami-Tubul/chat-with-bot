@@ -23,6 +23,15 @@ io.on("connection", (socket) => {
     // Send chat history to newly connected user
     socket.emit("chatHistory", getHistory());
 
+    // Listen for typing events
+    socket.on("typing", (userName) => {
+        socket.broadcast.emit("userTyping", { userId: socket.id, userName });
+    });
+
+    socket.on("stopTyping", (userName) => {
+        socket.broadcast.emit("userStopTyping", { userId: socket.id, userName });
+    });
+
     // Listen for messages from clients
     socket.on("sendMessage", async (msg) => {
         const userId = msg.userId || socket.id;

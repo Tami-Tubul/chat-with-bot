@@ -6,12 +6,12 @@
   }"
 >
   @if(!isMyMessage){
-  <div class="message-user" [style.color]="getUserColor(message.userId)">
+  <div class="message-user" [style.--user-color]="getUserColor(message.userId)">
     {{ message.userId === "bot" ? "🤖 AngularBot" : getUserName }}
   </div>
   }
   <div class="message-text">
     {{ message.text }}
   </div>
-  <span class="timestamp">{{ message.timestamp | date : "HH:mm" }}</span>
+  <span class="timestamp">{{ message.timestamp | messageDate }}</span>
 </div>

@@ -6,7 +6,7 @@
       >ולקבל תשובות משעשעות מהבוט שלנו 🤖 מומחה באנגלר ופיתוח אתרים 💻✨</span
     >
   </div>
-  <ul class="messages" aria-live="polite">
+  <ul class="messages" aria-live="polite" [appAutoScroll]="messages">
     @for(msg of messages; track msg.id){
     <app-message
       [message]="msg"

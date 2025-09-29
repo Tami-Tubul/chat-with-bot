@@ -2,10 +2,11 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Message } from '../../models/message.model';
 import { AppMaterialModule } from '../../../app.material.module';
+import { MessageDatePipe } from '../../../shared/pipes/message-date.pipe';
 
 @Component({
   selector: 'app-message',
-  imports: [CommonModule, AppMaterialModule],
+  imports: [CommonModule, AppMaterialModule, MessageDatePipe],
   templateUrl: './chat-message.component.html',
   styleUrl: './chat-message.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush

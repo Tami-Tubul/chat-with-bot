@@ -4,7 +4,6 @@ import { ChatComponent } from './chat.component';
 import { of, Subject } from 'rxjs';
 import { ChatService } from './services/chat.service';
 import { UserService } from './services/user.service';
-import { MatDialog } from '@angular/material/dialog';
 import { Message } from './models/message.model';
 
 describe('ChatComponent', () => {
@@ -12,9 +11,9 @@ describe('ChatComponent', () => {
   let fixture: ComponentFixture<ChatComponent>;
   let chatServiceSpy: any;
   let userServiceSpy: any;
-  let dialogSpy: any;
 
   beforeEach(async () => {
+
     chatServiceSpy = jasmine.createSpyObj('ChatService',
       ['sendMessage', 'getSocketId', 'getChatHistory', 'onNewMessage', 'onUserTyping', 'onUserStopTyping']);
 
@@ -29,20 +28,11 @@ describe('ChatComponent', () => {
     userServiceSpy.getUserId.and.returnValue('user123');
     userServiceSpy.getUserName.and.returnValue('Tami');
 
-    dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
-    dialogSpy.open.and.returnValue({
-      componentInstance: {},
-      afterClosed: () => of('NewUser'),
-      close: () => { },
-    });
-
-
     await TestBed.configureTestingModule({
       imports: [ChatComponent],
       providers: [
         { provide: ChatService, useValue: chatServiceSpy },
         { provide: UserService, useValue: userServiceSpy },
-        { provide: MatDialog, useValue: dialogSpy }
       ]
     }).compileComponents();
 
@@ -106,11 +96,39 @@ describe('ChatComponent', () => {
     expect(component.typingUsers).not.toContain(jasmine.objectContaining(typingUser));
   }));
 
-  xit('should open username dialog if username is missing', () => {
-    userServiceSpy.getUserName.and.returnValue(null);
+  it('should set currentUserId from socketId if not set', fakeAsync(() => {
+    chatServiceSpy.getSocketId.and.returnValue(of('socket999'));
+    component.currentUserId = '';
+    component['initSocketId']();
+    tick();
+    expect(component.currentUserId).toBe('socket999');
+    expect(userServiceSpy.setUserId).toHaveBeenCalledWith('socket999');
+  }));
 
-    component['initUser']();
-    expect(dialogSpy.open).toHaveBeenCalled();
+  it('should not override currentUserId if already set', fakeAsync(() => {
+    component.currentUserId = 'existingId';
+    component['initSocketId']();
+    tick();
+    expect(component.currentUserId).toBe('existingId');
+    expect(userServiceSpy.setUserId).not.toHaveBeenCalled();
+  }));
+
+  it('should load chat history', fakeAsync(() => {
+    const history: Message[] = [
+      { id: '1', userId: 'u1', userName: 'A', text: 'Hi', type: 'user', timestamp: new Date() }
+    ];
+    chatServiceSpy.getChatHistory.and.returnValue(of(history));
+    component['initChatHistory']();
+    tick();
+    expect(component.messages).toEqual(history);
+  }));
+
+  it('should correctly identify my message', () => {
+    component.currentUserId = 'user123';
+    const msgMine: Message = { id: '1', userId: 'user123', userName: 'Tami', text: '', type: 'user', timestamp: new Date() };
+    const msgOther: Message = { id: '2', userId: 'someoneElse', userName: 'Alice', text: '', type: 'user', timestamp: new Date() };
+    expect(component.isMyMessage(msgMine)).toBeTrue();
+    expect(component.isMyMessage(msgOther)).toBeFalse();
   });
 
 });

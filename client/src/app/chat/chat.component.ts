@@ -7,11 +7,11 @@ import { ChatInputComponent } from './components/chat-input/chat-input.component
 import { UsernameDialogComponent } from '../shared/components/username-dialog/username-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { Subject, takeUntil } from 'rxjs';
-import { scrollToBottom } from '../shared/utils/auto-scroll';
+import { AutoScrollDirective } from '../shared/directives/auto-scroll.directive';
 
 @Component({
   selector: 'app-chat',
-  imports: [ChatMessageComponent, ChatInputComponent],
+  imports: [ChatMessageComponent, ChatInputComponent, AutoScrollDirective],
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.scss',
 })
@@ -36,7 +36,6 @@ export class ChatComponent {
     this.initTypingEvents();
     this.initNewMessages();
   }
-
 
   ngOnDestroy(): void {
     this.destroy$.next();
@@ -78,7 +77,6 @@ export class ChatComponent {
       .pipe(takeUntil(this.destroy$))
       .subscribe(history => {
         this.messages = history;
-        scrollToBottom('.messages');
       });
   }
 
@@ -108,8 +106,7 @@ export class ChatComponent {
 
   /** --- Handle new messages --- */
   private handleNewMessage(msg: Message): void {
-    this.messages.push(msg);
-    scrollToBottom('.messages');
+    this.messages = [...this.messages, msg];
   }
 
   /** Opens a dialog to prompt the user for a username if none exists. */
@@ -140,7 +137,6 @@ export class ChatComponent {
       userId: this.currentUserId,
       userName: this.currentUserName
     });
-    scrollToBottom('.messages');
   }
 
   /** Returns true if the given message was sent by the current user. */

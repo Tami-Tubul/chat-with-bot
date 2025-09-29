@@ -1,5 +1,5 @@
 import { Component, ElementRef, EventEmitter, HostListener, Input, Output, ViewChild } from '@angular/core';
-import { FormBuilder, FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AppMaterialModule } from '../../../app.material.module';
 import { PickerComponent } from '@ctrl/ngx-emoji-mart';
 import { debounceTime } from 'rxjs';
@@ -19,7 +19,7 @@ export class ChatInputComponent {
   messageControl = new FormControl('');
   showEmojiPicker = false; // Flag for showing/hiding emoji picker
 
-  constructor(private chatService: ChatService, private fb: FormBuilder) { }
+  constructor(private chatService: ChatService) { }
 
   ngOnInit() {
 

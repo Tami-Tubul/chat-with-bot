@@ -29,7 +29,18 @@ async function addBotMessageIfNeeded(io, text) {
         // Notify clients that bot is typing
         io.emit("userTyping", { userId: "bot", userName: "🤖 AngularBot" });
 
-        const reply = await getBotReply(text);
+        const MIN_TYPING_TIME = 1000; // minimum 1 second
+        const start = Date.now();  // record start time
+
+        const reply = await getBotReply(text); // wait for bot reply
+
+        const elapsed = Date.now() - start; // calculate time passed
+        const remainingTime = MIN_TYPING_TIME - elapsed;  // how much more to wait to reach min typing time
+
+        // waiting if minimum time has not passed yet
+        if (remainingTime > 0) {
+            await new Promise(res => setTimeout(res, remainingTime));
+        }
 
         // Notify clients that bot stopped typing
         io.emit("userStopTyping", { userId: "bot" });
